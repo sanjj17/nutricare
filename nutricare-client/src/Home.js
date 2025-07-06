@@ -63,11 +63,29 @@ const getSuggestions = (formData) => {
 const allTags = [...goals, ...Object.keys(conditions).filter((c) => conditions[c])];
 if (age > 50) allTags.push("age_above_50");
 
+// 🍽 Structured suggestions by meal
+const mealSuggestions = {
+  breakfast: [],
+  lunch: [],
+  dinner: []
+};
+
 foodData.forEach((item) => {
   if (item.suitableFor.some((tag) => allTags.includes(tag))) {
-    suggestions.push(`Try including ${item.name} – ${item.benefits.join(", ")}`);
+    const line = `${item.name} – ${item.benefits.join(", ")}`;
+    if (mealSuggestions[item.meal]) {
+      mealSuggestions[item.meal].push(line);
+    }
   }
 });
+
+// ✅ Push meal-wise suggestions
+for (let meal in mealSuggestions) {
+  if (mealSuggestions[meal].length) {
+    suggestions.push(`🍽 ${meal.charAt(0).toUpperCase() + meal.slice(1)}:`);
+    suggestions.push(...mealSuggestions[meal]);
+  }
+}
 
    
 
@@ -79,6 +97,8 @@ foodData.forEach((item) => {
 function App() {
    const navigate = useNavigate(); 
   const [nutritionTips, setNutritionTips] = useState([]);
+  const [showWeeklyPlan, setShowWeeklyPlan] = useState(false);
+
 
  const [formData, setFormData] = useState({
   name: "",
@@ -135,6 +155,30 @@ alert(message);
   alert("❌ Failed to submit.");
 }
 
+};
+const generateWeeklyPlan = () => {
+  const meals = { breakfast: [], lunch: [], dinner: [] };
+
+  nutritionTips.forEach((tip) => {
+    if (tip.startsWith("🍽 Breakfast:")) meals.current = "breakfast";
+    else if (tip.startsWith("🍽 Lunch:")) meals.current = "lunch";
+    else if (tip.startsWith("🍽 Dinner:")) meals.current = "dinner";
+    else if (meals.current) meals[meals.current].push(tip);
+  });
+
+  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+  const weekly = [];
+
+  for (let i = 0; i < 7; i++) {
+    weekly.push({
+      day: days[i],
+      breakfast: meals.breakfast[i % meals.breakfast.length] || "-",
+      lunch: meals.lunch[i % meals.lunch.length] || "-",
+      dinner: meals.dinner[i % meals.dinner.length] || "-",
+    });
+  }
+
+  return weekly;
 };
 
 
@@ -261,6 +305,17 @@ alert(message);
           >
             Submit
           </button>
+          <div className="mt-4">
+  <label className="flex items-center gap-2 text-sm text-blue-800">
+    <input
+      type="checkbox"
+      checked={showWeeklyPlan}
+      onChange={() => setShowWeeklyPlan(!showWeeklyPlan)}
+    />
+    Show Weekly Diet Plan
+  </label>
+</div>
+
         </form>
         {nutritionTips.length > 0 && (
   <div className="mt-4 p-4 border rounded-lg bg-green-50">
@@ -272,6 +327,52 @@ alert(message);
     </ul>
   </div>
 )}
+{nutritionTips.length > 0 && (
+  <button
+    onClick={() => setShowWeeklyPlan(!showWeeklyPlan)}
+    className="mb-4 w-full bg-yellow-100 text-yellow-800 py-2 rounded border border-yellow-300 hover:bg-yellow-200 transition"
+  >
+    {showWeeklyPlan ? "Hide Weekly Diet Plan" : "🍽 Show Weekly Diet Plan"}
+  </button>
+)}
+
+{nutritionTips.length > 0 && (
+  <div className="mt-4 p-4 border rounded-lg bg-green-50">
+    <h2 className="text-lg font-bold mb-2 text-green-700">Nutrition Suggestions:</h2>
+    <ul className="list-disc pl-5 text-green-800">
+      {nutritionTips.map((tip, index) => (
+        <li key={index}>{tip}</li>
+      ))}
+    </ul>
+  </div>
+)}
+
+{showWeeklyPlan && nutritionTips.length > 0 && (
+  <div className="mt-6">
+    <h3 className="text-lg font-bold text-blue-800 mb-2">📅 Weekly Diet Plan</h3>
+    <table className="w-full text-sm border border-gray-300 text-left bg-white rounded-md overflow-hidden">
+      <thead className="bg-blue-100 text-blue-700">
+        <tr>
+          <th className="p-2">Day</th>
+          <th className="p-2">Breakfast</th>
+          <th className="p-2">Lunch</th>
+          <th className="p-2">Dinner</th>
+        </tr>
+      </thead>
+      <tbody>
+        {generateWeeklyPlan().map((day, i) => (
+          <tr key={i} className="border-t">
+            <td className="p-2 font-semibold">{day.day}</td>
+            <td className="p-2">{day.breakfast}</td>
+            <td className="p-2">{day.lunch}</td>
+            <td className="p-2">{day.dinner}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
 
       </div>
     </div>
