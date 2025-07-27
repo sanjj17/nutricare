@@ -4,17 +4,26 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.STRING,
       allowNull: false,
     },
+     email: { // 🆕 Added email
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    password: { // 🆕 Added password
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
     age: {
       type: DataTypes.INTEGER,
-      allowNull: false,
+      allowNull: true,
     },
     weight: {
       type: DataTypes.FLOAT,
-      allowNull: false,
+      allowNull: true,
     },
     gender: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     diabetes: {
       type: DataTypes.BOOLEAN,
@@ -28,6 +37,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.BOOLEAN,
       defaultValue: false,
     },
+    goals: {
+      type: DataTypes.JSON, // ✅ store array of selected goals
+      defaultValue: [],
+    }
   });
 
   return User;

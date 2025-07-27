@@ -19,6 +19,8 @@ db.sequelize.sync().then(() => {
 
 // Routes
 require("./routes/user.routes")(app);
+require("./routes/auth.routes")(app);
+
 
 // Server start
 app.listen(PORT, () => {
