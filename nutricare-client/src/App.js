@@ -8,6 +8,7 @@ import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Landing from "./pages/Landing";
+import CreateProfile from './pages/CreateProfile'; 
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/result" element={<Result />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/profile/create" element={<CreateProfile />} />
         {/* Example ProtectedRoute usage if needed:
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} /> 
         */}

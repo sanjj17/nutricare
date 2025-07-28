@@ -1,11 +1,11 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // ✅ this is fine
+import { useAuth } from "../context/AuthContext";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // ✅ moved inside component
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -24,11 +24,24 @@ const Signup = () => {
     e.preventDefault();
     try {
       const res = await axios.post("http://localhost:8080/api/signup", formData);
-      alert("🎉 Signup successful!");
-      localStorage.setItem("token", res.data.token);
-      login(res.data.user); // ✅ optional: update auth context
-    navigate("/profile/create"); // or a separate route for new profiles
+      
+      // Debug log
+      console.log("Signup response:", res.data);
 
+  if (res.data && res.data.user && res.data.token) {
+  alert("🎉 Signup successful!");
+
+  localStorage.setItem("token", res.data.token);
+  localStorage.setItem("userName", res.data.user.name);
+  localStorage.setItem("userEmail", res.data.user.email);
+
+  login(res.data.user);
+  navigate("/profile/create");
+}
+ else {
+        alert("Signup succeeded, but user info is incomplete.");
+        console.warn("Unexpected signup response format:", res.data);
+      }
     } catch (err) {
       console.error("Signup error:", err);
       if (err.response?.data?.message === "Email already registered") {
